@@ -12,9 +12,9 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
-    {
-        // 
-        return response()->view('welcome');
+    {   // 獲取 data   ↓ 這個在最下面
+        $data = $this->meow();
+        return response($data);
     }
 
     /**
@@ -81,5 +81,22 @@ class ProductController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    // 開發API
+    public function meow()
+    {
+        return [
+            [
+                'title' => 'Test 1',
+                'content' => 'Good Product',
+                'price' => '50',
+            ],
+            [
+                'title' => 'Test 2',
+                'content' => 'Great Product',
+                'price' => '60',
+            ]
+        ];
     }
 }
