@@ -19,6 +19,11 @@ Route::get('/', function () {
 // RESTful API
 Route::resource('products', 'ProductController');
 
+Route::resource('carts', 'CartController');
+
+Route::resource('cart_items', 'CartItemController');
+
+
 // Route::group([
 //     // middleware 中間層   ↓ 自己寫的 function
 //     'middleware' => ['checkValueIp'],

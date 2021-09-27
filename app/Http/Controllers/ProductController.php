@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -13,8 +14,9 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {   // 獲取 data   ↓ 這個在最下面
-        $data = $this->meow();
-        dd($data);
+        // $data = $this->meow();
+        $data = DB::table('product')->get();
+
         return response($data);
     }
 
