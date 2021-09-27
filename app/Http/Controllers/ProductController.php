@@ -14,6 +14,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {   // 獲取 data   ↓ 這個在最下面
         $data = $this->meow();
+        dd($data);
         return response($data);
     }
 
@@ -35,7 +36,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $this->meow();
+        $newDate = $request->all();
+        $data->push(collect( $newDate )) ;
+        dd($data);
+        return response($data);
+
     }
 
     /**
@@ -69,7 +75,14 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        // 使用 collection 功能去做
+        $from = $request->all();
+        $data = $this->meow();
+        // 找新增的資料 where 第一個是從哪個 key，第二個是 key 是什麼的資料，接著對第一筆更新
+        $selectData = $data->where('id', $id)->first();
+        // 更新
+        $selectData = $selectData->merge(collect( $from) );
+        return response($selectData);
     }
 
     /**
@@ -80,23 +93,32 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // 刪除
+        $data = $this->meow();
+                                // 讓程式使用 $id ↓
+        $data = $data->filter(function ($product) use ($id) {
+            // 如果不等於 要刪除的ID 94說是要刪除的資料
+            return $product['id'] != $id;
+        });
+        return response($data->values());
     }
 
     // 開發API
     public function meow()
     {
-        return [
-            [
+        return collect([
+            collect([
+                'id' => 0,
                 'title' => 'Test 1',
                 'content' => 'Good Product',
                 'price' => '50',
-            ],
-            [
+            ]),
+            collect([
+                'id' => 1,
                 'title' => 'Test 2',
                 'content' => 'Great Product',
                 'price' => '60',
-            ]
-        ];
+            ]),
+        ]);
     }
 }

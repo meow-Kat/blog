@@ -18,7 +18,6 @@ Route::get('/', function () {
 });
 // RESTful API
 Route::resource('products', 'ProductController');
-Route::post('/', 'ProductController@create');
 
 // Route::group([
 //     // middleware 中間層   ↓ 自己寫的 function
