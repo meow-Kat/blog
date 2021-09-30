@@ -17,12 +17,16 @@ Route::get('/', function () {
     return view('welcome');
 });
 // RESTful API
-Route::resource('products', 'ProductController');
 
 Route::resource('carts', 'CartController');
 
 Route::resource('cart_items', 'CartItemController');
 
+Route::group(['middleware' => 'check.dirty'], function ()
+{
+    Route::resource('products', 'ProductController');
+
+});
 
 // Route::group([
 //     // middleware 中間層   ↓ 自己寫的 function

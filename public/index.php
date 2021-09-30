@@ -44,8 +44,10 @@ require __DIR__.'/../vendor/autoload.php';
 |
 */
 
+// 本身應用程式
 $app = require_once __DIR__.'/../bootstrap/app.php';
 
+// 並且啟動
 $kernel = $app->make(Kernel::class);
 
 $response = tap($kernel->handle(

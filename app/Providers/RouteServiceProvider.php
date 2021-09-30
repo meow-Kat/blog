@@ -19,7 +19,7 @@ class RouteServiceProvider extends ServiceProvider
      */
     public const HOME = '/home';
     
-    // 新增 attr 不然 route 讀不到
+    // 新增 attr 不然 route 讀不到，32行反註解也可以
     protected $namespace = 'App\Http\Controllers';
 
     /**
