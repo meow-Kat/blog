@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-
+// 使用這個內建套件
+use Illuminate\Support\Facades\Validator;
+// 引進來
+use App\Http\Requests\UpdateCartItem;
 
 class CartItemController extends Controller
 {
@@ -36,11 +39,24 @@ class CartItemController extends Controller
      */
     public function store(Request $request)
     {
-        $form = $request->all();
+        $message = [
+            'required' => ':attribute 是必要的',
+            'between' => ':attribute 的輸入 :input 不再 :min 和 :max 之間'
+        ];
+        $validator = Validator::make($request->all(), [
+            'cart_id' => 'required | integer | between:1,10',
+            'product_id' => 'required | integer | between:1,10',
+            'quantity' => 'required | integer | between:1,10',
+        ],$message);
+        if ($validator->fails()) {
+            return response($validator->errors(), 400);
+        }
+        // 通過驗證了後
+        $validatedData = $validator->validate();
         DB::table('cart_items')->insert([
-            'cart_id' => $form['cart_id'] ,
-            'product_id' => $form['product_id'] ,
-            'quantity' => $form['quantity'] ,
+            'cart_id' => $validatedData['cart_id'] ,
+            'product_id' => $validatedData['product_id'] ,
+            'quantity' => $validatedData['quantity'] ,
             'created_at' => now() ,
             'updated_at' => now(),
         ]);
@@ -77,9 +93,9 @@ class CartItemController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateCartItem $request, $id)
     {
-        $form = $request->all();
+        $form = $request->validated();
         // 更新語法用 update ，找出更新的資料
         DB::table('cart_items')->where('id', $id)->update([
             'quantity' => $form['quantity'] ,
