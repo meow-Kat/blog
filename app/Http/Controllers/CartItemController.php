@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 // 引進來
 use App\Http\Requests\UpdateCartItem;
+// 引入 2個 Model
+use App\Models\Cart;
+use App\Models\CartItem;
+
 
 class CartItemController extends Controller
 {
@@ -53,13 +57,23 @@ class CartItemController extends Controller
         }
         // 通過驗證了後
         $validatedData = $validator->validate();
-        DB::table('cart_items')->insert([
-            'cart_id' => $validatedData['cart_id'] ,
+        
+        $cart = Cart::find($validatedData['cart_id']);
+
+        $result = $cart->cartItems->create([
             'product_id' => $validatedData['product_id'] ,
             'quantity' => $validatedData['quantity'] ,
-            'created_at' => now() ,
-            'updated_at' => now(),
         ]);
+        return response()->json($result);
+
+
+        // DB::table('cart_items')->insert([
+        //     'cart_id' => $validatedData['cart_id'] ,
+        //     'product_id' => $validatedData['product_id'] ,
+        //     'quantity' => $validatedData['quantity'] ,
+        //     'created_at' => now() ,
+        //     'updated_at' => now(),
+        // ]);
         // 用這個方式包 資料庫才會存 true
         return response()->json(true);
     }
@@ -96,13 +110,26 @@ class CartItemController extends Controller
     public function update(UpdateCartItem $request, $id)
     {
         $form = $request->validated();
-        // 更新語法用 update ，找出更新的資料
-        DB::table('cart_items')->where('id', $id)->update([
-            'quantity' => $form['quantity'] ,
-            'updated_at' => now(),
-        ]);
-        // 用這個方式包 資料庫才會存 true
+
+        $item = CartItem::find($id);
+        // 使用 fill() ，把欄位填好不儲存，如果欄位太多太雜可以使用這個函式，不用每個檢查後都存，可以增加效能
+        $item->fill(['quantity' => $form['quantity']]);
+        // 使用 save() 可以把最後輸入的資料更新進去
+	    $item->save();
+
+        // 也可以使用 update()，就不需要 save()
+	    //$item->update(['quantity' => $form['quantity']]);
+        
         return response()->json(true);
+
+
+        // // 更新語法用 update ，找出更新的資料
+        // DB::table('cart_items')->where('id', $id)->update([
+        //     'quantity' => $form['quantity'] ,
+        //     'updated_at' => now(),
+        // ]);
+        // // 用這個方式包 資料庫才會存 true
+        // return response()->json(true);
     }
 
     /**
@@ -113,8 +140,10 @@ class CartItemController extends Controller
      */
     public function destroy($id)
     {
+
+        CartItem::find($id)->delete();
         // 更新語法用 update ，找出更新的資料
-        DB::table('cart_items')->where('id', $id)->delete();
+        // DB::table('cart_items')->where('id', $id)->delete();
         return response()->json(true);
     }
 }

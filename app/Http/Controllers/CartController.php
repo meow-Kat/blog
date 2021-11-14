@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Cart;
+
 
 class CartController extends Controller
 {
@@ -14,17 +16,22 @@ class CartController extends Controller
      */
     public function index()
     {
-        $cart = DB::table('carts')->get()->first();
-        // 判斷空值
-        if(empty($cart)){
-            DB::table('carts')->insert(['created_at' => now() , 'updated_at' => now()]);
-            $cart = DB::table('carts')->get()->first();
-        }
-        $cartItems = DB::table('cart_items')->where('cart_id', $cart->id)->get();
-        $cart = collect($cart);
-        $cart['items'] = collect($cartItems);
+        // 修改
+        // firstOrcreate() 判斷 table 裡面有沒有資料如果沒有就新增
+        // with(['']) 的作用，根據裡面的字串尋找 Model 內對應關聯，順便撈出來
+	    $cart = Cart::with(['cartItems'])->firstorCreate();
 
-        return response($cart);
+        // $cart = DB::table('carts')->get()->first();
+        // // 判斷空值
+        // if(empty($cart)){
+        //     DB::table('carts')->insert(['created_at' => now() , 'updated_at' => now()]);
+        //     $cart = DB::table('carts')->get()->first();
+        // }
+        // $cartItems = DB::table('cart_items')->where('cart_id', $cart->id)->get();
+        // $cart = collect($cart);
+        // $cart['items'] = collect($cartItems);
+
+        // return response($cart);
     }
 
     /**
