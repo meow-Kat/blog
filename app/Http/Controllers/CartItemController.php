@@ -57,7 +57,7 @@ class CartItemController extends Controller
         }
         // 通過驗證了後
         $validatedData = $validator->validate();
-        
+
         $cart = Cart::find($validatedData['cart_id']);
 
         $result = $cart->cartItems->create([
@@ -119,7 +119,7 @@ class CartItemController extends Controller
 
         // 也可以使用 update()，就不需要 save()
 	    //$item->update(['quantity' => $form['quantity']]);
-        
+
         return response()->json(true);
 
 
@@ -140,10 +140,13 @@ class CartItemController extends Controller
      */
     public function destroy($id)
     {
-
+        // 這樣就軟刪除了
         CartItem::find($id)->delete();
         // 更新語法用 update ，找出更新的資料
         // DB::table('cart_items')->where('id', $id)->delete();
         return response()->json(true);
+        // 如果要真的硬刪除
+        // CartItem::find($id)->forceDelete();
+
     }
 }

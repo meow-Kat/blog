@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CartItem extends Model
 {
     use HasFactory;
+
+    use SoftDeletes; // 新增這行
+
     // 白名單功能
     protected $fillable = [];
     // 黑名單功能
@@ -19,7 +23,7 @@ class CartItem extends Model
             // 當 Model 呼叫 ↑ 屬性的時候，會執行下面的函式
     public function getCurrentPriceAttribut()
     {
-        // 這個 Model 本身的 ↓ 
+        // 這個 Model 本身的 ↓
         return $this->quantity * 10;
     }
 
