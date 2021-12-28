@@ -2,8 +2,11 @@
 
 namespace App\Exceptions;
 
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+// 引入驗秤錯誤時候的套件
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
@@ -37,5 +40,11 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    public function unauthenticated($request, AuthenticationException $exception)
+    {
+        // 發現有錯誤的時候
+        return response('授權失敗', 401);
     }
 }

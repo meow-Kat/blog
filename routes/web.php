@@ -28,6 +28,17 @@ Route::group(['middleware' => 'check.dirty'], function ()
 
 });
 
+// 增加建立會員的路由
+Route::post('signup', 'AuthController@signup');
+
+Route::post('login', 'AuthController@login');
+
+                            // 使用 auth 提供的 middleware
+Route::group(['middleware' => 'auth:api'],function () {
+    Route::get('user', 'AuthController@user');
+    Route::get('logout', 'AuthController@logout');
+});
+
 // Route::group([
 //     // middleware 中間層   ↓ 自己寫的 function
 //     'middleware' => ['checkValueIp'],
