@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Redis;
+use App\Models\Product;
 
 class ProductController extends Controller
 {
@@ -15,7 +17,9 @@ class ProductController extends Controller
     public function index(Request $request)
     {   // 獲取 data   ↓ 這個在最下面
         // $data = $this->meow();
-        $data = DB::table('product')->get();
+        // $data = DB::table('product')->get();
+        // 取出來要轉碼
+        $data = json_decode(Redis::get('product'));
 
         return response($data);
     }

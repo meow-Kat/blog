@@ -17,9 +17,15 @@ class CartController extends Controller
     public function index()
     {
         // 修改
+        
+        // 透過這樣函式可以拿到通過驗證的 user 的資料
+        $user = auth()->user();
+
         // firstOrcreate() 判斷 table 裡面有沒有資料如果沒有就新增
         // with(['']) 的作用，根據裡面的字串尋找 Model 內對應關聯，順便撈出來
-	    $cart = Cart::with(['cartItems'])->firstorCreate();
+
+        // 檢查 沒有這個人的購物車才要增加，如果有就使用這個人的購物車，沒找到資料就會 create
+	    $cart = Cart::with(['cartItems'])->where('user_id', $user->id)->where('checkouted', false) ->firstorCreate(['user_id' => $user->id ]);
 
         // $cart = DB::table('carts')->get()->first();
         // // 判斷空值
@@ -98,5 +104,21 @@ class CartController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+
+    // 新增結帳的流程
+    public function checkout()
+    {
+        // 誰要結帳
+        $user = auth()->user();                          // 使用 model 取資料的 function，這樣使用 width 比較省效能
+        $cart = $user->carts()->where('checkouted', false)->with('cartItems')->first();
+        // 如果有撈到 $cart
+        if($cart){
+            $result = $cart->checkout();
+            return response($result);
+        }else{
+            return response('沒有購物車', 400);
+        }
     }
 }

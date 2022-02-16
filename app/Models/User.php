@@ -42,4 +42,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function carts()
+    {   // 系統會自己找 Cart_id 自己對應到 Product
+        return $this->hasMany(Cart::class);
+    }
 }

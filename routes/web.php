@@ -13,20 +13,21 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', 'WebController@index');
+Route::get('/contact_us', 'WebController@contactUs');
 // RESTful API
 
-Route::resource('carts', 'CartController');
-
-Route::resource('cart-items', 'CartItemController');
 
 Route::group(['middleware' => 'check.dirty'], function ()
 {
     Route::resource('products', 'ProductController');
 
 });
+
+// notification
+Route::post('admin/orders/{id}/delivery', 'OrderController@delivery');
+Route::post('admin/tools/update-product-price', 'ToolController@updateProductPrice');
+Route::post('admin/tools/create-product-redis', 'ToolController@createProductRedis');
 
 // 增加建立會員的路由
 Route::post('signup', 'AuthController@signup');
@@ -37,6 +38,12 @@ Route::post('login', 'AuthController@login');
 Route::group(['middleware' => 'auth:api'],function () {
     Route::get('user', 'AuthController@user');
     Route::get('logout', 'AuthController@logout');
+    // 這兩個要放在 auth:api 內
+    Route::resource('carts', 'CartController');
+    Route::resource('cart-items', 'CartItemController');
+    // 加上購物車的路由
+    Route::post('carts/checkout', 'CartController@checkout');
+
 });
 
 // Route::group([

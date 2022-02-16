@@ -11,6 +11,9 @@ use App\Http\Requests\UpdateCartItem;
 // 引入 2個 Model
 use App\Models\Cart;
 use App\Models\CartItem;
+// product 檢查
+use App\Models\Product;
+
 
 
 class CartItemController extends Controller
@@ -57,11 +60,18 @@ class CartItemController extends Controller
         }
         // 通過驗證了後
         $validatedData = $validator->validate();
+        // 驗證之後
+        $product = Product::find($validatedData['product_id']);
+        // 如果有問題
+        if(!$product->checkQuantity($validatedData['quantity'])){
+            return response($product->title.'數量不足' , 400);
+        }
 
         $cart = Cart::find($validatedData['cart_id']);
 
         $result = $cart->cartItems->create([
-            'product_id' => $validatedData['product_id'] ,
+            // 改成撈到 product 的 id
+            'product_id' => $product->id ,
             'quantity' => $validatedData['quantity'] ,
         ]);
         return response()->json($result);
