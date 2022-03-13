@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Exports\OrderMultipleExport;
+use App\Exports\OrderExport;
 use Illuminate\Http\Request;
 use App\Notifications\OrderDelivery;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
@@ -20,5 +23,15 @@ class OrderController extends Controller
             $order->user->notify(new OrderDelivery);
             return response(['result' => true]);
         }
+    }
+
+    public function export()
+    {   // 第二個參數是檔案名稱
+        return Excel::download(new OrderExport, 'orders.xlsx');
+    }
+
+    public function exportByShipped()
+    {   // 第二個參數是檔案名稱
+        return Excel::download(new OrderMultipleExport, 'orders_by_shipped.xlsx');
     }
 }

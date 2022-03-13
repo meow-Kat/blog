@@ -47,4 +47,9 @@ class User extends Authenticatable
     {   // 系統會自己找 Cart_id 自己對應到 Product
         return $this->hasMany(Cart::class);
     }
+
+    public function favorite_product()
+    {   // 跟 product 的關係, 中間表格，因為建 table 有設定好外建是誰所以就可以不需要寫後面的兩個參數
+        return $this->belongsToMany(Product::class, 'favorites');
+    }
 }

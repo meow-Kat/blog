@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Product extends Model
 {
     use HasFactory;
@@ -22,5 +23,10 @@ class Product extends Model
             return false;
         }
         return true;
+    }
+
+    public function favorite_user()
+    {   // 跟 user 的關係, 中間表格，因為建 table 有設定好外建是誰所以就可以不需要寫後面的兩個參數
+        return $this->belongsToMany(User::class, 'favorites');
     }
 }

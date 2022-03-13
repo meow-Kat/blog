@@ -2,10 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Imports\ProductsImport;
+use Maatwebsite\Excel\Facades\Excel;
+// 製作一個
 use Illuminate\Support\Facades\Redis;
-use App\Models\Product;
+// 引入
+use App\Http\Services\ShortUrlService;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -126,5 +132,52 @@ class ProductController extends Controller
                 'price' => '60',
             ]),
         ]);
+    }
+
+    
+    public function sharedUrl($id)
+    {
+        $service = new ShortUrlService();
+        // 這邊要使用雙引號才能作用
+        $url = $service->makeShortUrl("http://localhost:3000/products/$id");
+        return response(['url' => $url]);
+    }
+
+    public function upLoadImage(Request $request)
+    {
+        //  拿到圖片
+        $file = $request->file('product_image');
+        $productId = $request->input('product_id');
+        // 如果沒圖片就回上一頁
+        if(is_null($productId)){
+            // 顯示前端參數錯誤
+            return redirect()->back()->withErrors(['msg' => '參數錯誤']);
+        }
+        $product = Product::find($productId);
+        // 這樣就存好了
+        $path = $file->store('images'); // 這邊會回傳路徑
+        $product->images()->create([
+            // 能拿到使用者上傳的黨名
+            'filename' => $file->getClientOriginalName(),
+            'path' => $path
+        ]);
+        return redirect()->back();
+    }
+
+    public function getImageUrlAttribute()
+    {
+        $images = $this->images;
+        if($images->isNotEmpty()){
+            // Storage 內建套件去對儲存空間操作
+            // $images->last()->path 把路徑放進去產生指定資料夾位置
+            return Storage::url($images->last()->path);
+        }
+    }
+
+    public function import(Request $request)
+    {
+        $file = $request->file('excel');
+        Excel::import(new ProductsImport, $file);
+	    return redirect()->back();
     }
 }

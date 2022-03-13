@@ -46,6 +46,10 @@ Route::group(['middleware' => 'auth:api'],function () {
 
 });
 
+Route::get('products/{id}/shared-url', 'ProductController@sharedUrl');
+
+// exl 下載路由
+Route::get('admin/orders/excel/export', 'OrderController@export');
 // Route::group([
 //     // middleware 中間層   ↓ 自己寫的 function
 //     'middleware' => ['checkValueIp'],

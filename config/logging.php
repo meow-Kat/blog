@@ -41,6 +41,11 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'url_shorten' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/url_shorten.log'),
+            'level' => env('LOG_LEVEL', 'debug'),
+        ],
         'single' => [
             'driver' => 'single',
             'path' => storage_path('logs/laravel.log'),

@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use App\Models\LogErrors;
 use GuzzleHttp\Psr7\Request;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
@@ -38,7 +39,29 @@ class Handler extends ExceptionHandler
     public function register()
     {
         $this->reportable(function (Throwable $e) {
-            //
+            $user = auth()->user();
+            LogErrors::create([
+                'user_id' => $user ? $user->id : 0,
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+                'line' => $e->getline(),
+                // 會把全部參數放進來太多，使用 array_map 查找
+                'trace' => array_map( function($trace){
+                    // 過濾參數
+                    unset($trace['args']);
+                    return $trace;
+                }, $e->getTrace() ),
+                'method' => request()->getMethod(),
+                'params' => request()->all(),
+                'uri' => request()->getPathInfo(),
+                'user_agent' => request()->userAgent(),
+                'header' => request()->headers->all(),
+            ]);
+        });
+        // 客製錯誤畫面
+        $this->renderable(function(Throwable $e){
+            // 回傳錯誤畫面
+            return response()->view('error');
         });
     }
 
