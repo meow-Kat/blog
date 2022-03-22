@@ -2,12 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\Product;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\User;
+use App\Models\Product;
+use App\Models\CartItem;
 // 使用這個套件授權驗證登入，要引入
 use Laravel\Passport\Passport;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CartItemsControllerTest extends TestCase
 {
@@ -67,5 +68,56 @@ class CartItemsControllerTest extends TestCase
         );
         // 執行如果是 400 會通過
         $response->assertStatus(400);
+    }
+
+    public function testUpdate()
+    {
+        $cart = $this->fakeUser->carts()->create();
+        $product = Product::create([
+            'title' => 'test Product',
+            'content' => 'cool',
+            'price' => 10,
+            'quantity' => 10
+        ]);
+        $cartItem = $cart->cartItems()->create([
+            'product_id' => $product->id,
+            'quantity' => 10
+        ]);
+        $response = $this->call(
+            'PUT',
+            'cart-items/'.$cartItem->id,
+            [ 'quantity' => 1 ]
+        );
+        // assertEquals() 前者 ( 期待 ) 和後者 ( 回傳的 json 資料 ) 一樣
+        $this->assertEquals('true', $response->getContent());
+
+        // refresh() 重新更新資料
+        $cartItem->refresh();
+
+        $this->assertEquals(1 , $cartItem->quantity);
+    }
+
+    public function testDestroy()
+    {
+        $cart = $this->fakeUser->carts()->create();
+        $product = Product::create([
+           'title' => 'test Product',
+           'content' => 'cool',
+           'price' => 10,
+           'quantity' => 10
+        ]);
+        $cartItem = $cart->cartItems()->create([
+            'product_id' => $product->id,
+            'quantity' => 10
+        ]);
+        $response = $this->call(
+            'DELETE',
+            'cart-items/'.$cartItem->id,
+            [ 'quantity' => 1 ]
+        );
+        $response->assertOk();
+        $cartItem = CartItem::find($cartItem->id);
+        // assertNull 期待不被找到
+        $this->assertNull($cartItem);
     }
 }
