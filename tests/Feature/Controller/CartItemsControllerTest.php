@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Cart;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Product;
@@ -36,26 +37,39 @@ class CartItemsControllerTest extends TestCase
      */
     public function testStore()
     {
-       $cart = $this->fakeUser->carts()->create();
-       $product = Product::create([
-           'title' => 'test Product',
-           'content' => 'cool',
-           'price' => 10,
-           'quantity' => 10
-       ]);
-       // 這樣可以結構化打過去的資料
-       $response = $this->call(
-           'POST',
-           'cart-items',
-           [
-               'cart_id' => $cart->id,
-               'product_id' => $product->id,
-               'quantity' => 2,
-           ]
+        $cart = Cart::factory()->create([
+            // 切割必要資料
+            'user_id' => $this->fakeUser->id
+        ]);
+        $product = Product::factory()->create();
+        // 這樣可以結構化打過去的資料
+        $response = $this->call(
+            'POST',
+            'cart-items',
+            [
+                'cart_id' => $cart->id,
+                'product_id' => $product->id,
+                'quantity' => 2,
+            ]
         );
 
         // 直接設定執行是成功的
         $response->assertOk();
+
+        // 補在這邊
+        $product = Product::factory()->less()->create();
+        $response = $this->call(
+            'POST',
+            'cart-items',
+            [
+                'cart_id' => $cart->id,
+                'product_id' => $product->id,
+                'quantity' => 10,
+            ]
+        );
+        // 對照 CartItemsController 數量不足的寫法
+        $this->assertEquals($product->title.'數量不足' , $response->getContent());
+
 
         $response = $this->call(
             'POST',
@@ -72,17 +86,13 @@ class CartItemsControllerTest extends TestCase
 
     public function testUpdate()
     {
-        $cart = $this->fakeUser->carts()->create();
-        $product = Product::create([
-            'title' => 'test Product',
-            'content' => 'cool',
-            'price' => 10,
-            'quantity' => 10
-        ]);
-        $cartItem = $cart->cartItems()->create([
-            'product_id' => $product->id,
-            'quantity' => 10
-        ]);
+        // 原本
+        // $cart = Cart::factory()->create([
+        //     // 切割必要資料
+        //     'user_id' => $this->fakeUser->id
+        // ]);
+        // $product = Product::factory()->create();
+        $cartItem = CartItem::factory()->create();
         $response = $this->call(
             'PUT',
             'cart-items/'.$cartItem->id,
@@ -100,12 +110,7 @@ class CartItemsControllerTest extends TestCase
     public function testDestroy()
     {
         $cart = $this->fakeUser->carts()->create();
-        $product = Product::create([
-           'title' => 'test Product',
-           'content' => 'cool',
-           'price' => 10,
-           'quantity' => 10
-        ]);
+        $product = Product::factory()->make();
         $cartItem = $cart->cartItems()->create([
             'product_id' => $product->id,
             'quantity' => 10
