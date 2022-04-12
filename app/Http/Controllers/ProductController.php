@@ -12,9 +12,17 @@ use Illuminate\Support\Facades\Redis;
 // 引入
 use App\Http\Services\ShortUrlService;
 use Illuminate\Support\Facades\Storage;
+// 引入測試的 Services
+use App\Http\Services\AuthService;
 
 class ProductController extends Controller
 {
+    // 建立 construct 依賴注入
+    public function __construct(ShortUrlService $shortUrlService, AuthService $authService)
+    {
+        $this->$shortUrlService = $shortUrlService;
+        $this->$authService = $authService;
+    }
     /**
      * Display a listing of the resource.
      *
@@ -137,9 +145,11 @@ class ProductController extends Controller
     
     public function sharedUrl($id)
     {
-        $service = new ShortUrlService();
+        $this->authService->fakeReturn();
+        // 使用依賴注入這邊不需要了
+        // $service = new ShortUrlService();
         // 這邊要使用雙引號才能作用
-        $url = $service->makeShortUrl("http://localhost:3000/products/$id");
+        $url = $this->shortUrlService->makeShortUrl("http://localhost:3000/products/$id");
         return response(['url' => $url]);
     }
 
