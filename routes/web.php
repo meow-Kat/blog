@@ -61,3 +61,7 @@ Route::get('admin/orders/excel/export', 'OrderController@export');
 //     Route::get('/index', 'HomeController@index');
 //     Route::post('/print', 'HomeController@index');
 // });
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

@@ -13,13 +13,15 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
-        "predis/predis": "^1.1"
+        "predis/predis": "^1.1",
+        "yajra/laravel-datatables": "^1.5"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "laravel/dusk": "^6.22",
         "laravel/sail": "^1.0.1",
+        "laravel/ui": "^3.4",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
         "phpunit/phpunit": "^9.3.3"

@@ -25,6 +25,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
+        // 每分鐘執行一次
+        $schedule->command('export:orders')->everyMinute();
     }
 
     /**
